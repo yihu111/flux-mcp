@@ -1,6 +1,7 @@
-from fastmcp import FastMCP
+from mcp.server.fastmcp import FastMCP
+# from fastmcp import FastMCP
 from dotenv import load_dotenv
-from .flux_adapter import FluxAdapter
+from flux_adapter import FluxAdapter
 import os
 from typing import Any, Dict, Optional
 from pathlib import Path
