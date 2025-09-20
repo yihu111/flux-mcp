@@ -90,16 +90,13 @@ async def flux_generate(prompt: str) -> Dict[str, Any]:
 
 
 @mcp.tool()
-async def flux_edit_image(prompt: str, image_url: str, aspect_ratio: Optional[str] = None, seed: Optional[int] = None, output_format: str = "jpeg") -> Dict[str, Any]:
+async def flux_edit_image(prompt: str, image_url: str) -> Dict[str, Any]:
     """
     Edit an existing image using Black Forest Labs FLUX Kontext model.
 
     Args:
         prompt: Description of the edit to be applied to the image
         image_url: URL of the image to edit
-        aspect_ratio: Desired aspect ratio (e.g., "16:9", "1:1"). Optional.
-        seed: Seed for reproducibility. Optional.
-        output_format: Output format ("jpeg" or "png"). Defaults to "jpeg".
 
     Returns:
         Dictionary containing success status and URL of the edited image
@@ -116,7 +113,7 @@ async def flux_edit_image(prompt: str, image_url: str, aspect_ratio: Optional[st
             model="flux-kontext-max",
             use_raw_mode=False,
             api_key=api_key,
-            aspect_ratio=aspect_ratio,
+            aspect_ratio="16:9",
             safety_tolerance=6,
             prompt_upsampling=False,
         )
@@ -124,9 +121,9 @@ async def flux_edit_image(prompt: str, image_url: str, aspect_ratio: Optional[st
         edited_image_url, meta = await adapter.edit_image(
             prompt_text=prompt,
             image_url=image_url,
-            aspect_ratio=aspect_ratio,
-            seed=seed,
-            output_format=output_format
+            aspect_ratio=None,  # Preserve original aspect ratio
+            seed=None,  # Random seed for variety
+            output_format="jpeg"  # Standard JPEG output
         )
         
         return {
