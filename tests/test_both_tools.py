@@ -46,7 +46,6 @@ async def test_image_editing():
 
     try:
         # Test image editing with a sample image URL
-        # Note: You'll need to replace this with an actual image URL for testing
         sample_image_url = "https://example.com/sample-image.jpg"
         
         result = await runner.run(

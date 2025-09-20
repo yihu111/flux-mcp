@@ -1,8 +1,3 @@
-"""
-Flux MCP Server
-A Model Context Protocol server for AI image generation using Black Forest Labs' Flux models
-"""
-
 import os
 import sys
 from pathlib import Path
@@ -168,7 +163,6 @@ def main():
         return 0
 
     # Determine transport mode
-    # Note: port and host are already configured in the FastMCP instance above
     if (args.port or os.environ.get('PORT')) and not args.stdio:
         # HTTP transport mode
         actual_host = host if not args.host else args.host
