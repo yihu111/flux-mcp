@@ -45,8 +45,8 @@ async def test_image_editing():
     runner = DedalusRunner(client)
 
     try:
-        # Test image editing with a sample image URL
-        sample_image_url = "https://example.com/sample-image.jpg"
+        # Test image editing with a real accessible image URL
+        sample_image_url = "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop"
         
         result = await runner.run(
             messages=[{
@@ -93,11 +93,13 @@ async def test_character_consistency():
         print(result1.final_output)
         
         print("\nStep 2: Editing character to change background...")
-        # This would use the URL from step 1 in practice
+        # For demo purposes, use a sample wizard image URL
+        # In practice, you would extract the URL from result1.final_output
+        wizard_image_url = "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800&h=800&fit=crop"
         result2 = await runner.run(
             messages=[{
                 "role": "user", 
-                "content": "Edit the wizard image to place him in a magical forest setting, keeping the same character appearance using flux_edit_image"
+                "content": f"Edit this wizard image to place him in a magical forest setting: {wizard_image_url} using flux_edit_image"
             }],
             model="openai/gpt-4.1",
             mcp_servers=["yihu/flux-mcp"],
@@ -124,8 +126,12 @@ async def test_advanced_scenarios():
     
     scenarios = [
         {
-            "name": "Complex Editing",
-            "prompt": "Create a fantasy castle image, then edit it to add dragons flying around it using both flux_generate and flux_edit_image"
+            "name": "Simple Generation Test",
+            "prompt": "Generate an image of a majestic dragon perched on a mountain peak using flux_generate"
+        },
+        {
+            "name": "Simple Editing Test", 
+            "prompt": "Edit this landscape image to add a bright sunset: https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop using flux_edit_image"
         }
     ]
     

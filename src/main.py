@@ -113,7 +113,7 @@ async def flux_edit_image(prompt: str, image_url: str) -> Dict[str, Any]:
             model="flux-kontext-max",
             use_raw_mode=False,
             api_key=api_key,
-            aspect_ratio="16:9",
+            aspect_ratio="1:1",
             safety_tolerance=6,
             prompt_upsampling=False,
         )
@@ -121,7 +121,7 @@ async def flux_edit_image(prompt: str, image_url: str) -> Dict[str, Any]:
         edited_image_url, meta = await adapter.edit_image(
             prompt_text=prompt,
             image_url=image_url,
-            aspect_ratio=None,  # Preserve original aspect ratio
+            aspect_ratio="1:1",
             seed=None,  # Random seed for variety
             output_format="jpeg"  # Standard JPEG output
         )
