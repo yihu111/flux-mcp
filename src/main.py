@@ -64,7 +64,7 @@ async def flux_generate(prompt: str) -> Dict[str, Any]:
     safety_tolerance = 6
     prompt_upsampling = False
     raw = False
-    model = "flux-pro-1.1"
+    model = "flux-kontext-max"
     width: int = 1024
     height: int = 1024
     aspect_ratio: str | None = "16:9"
