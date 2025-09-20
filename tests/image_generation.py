@@ -1,8 +1,3 @@
-#!/usr/bin/env python3
-"""
-Simple test for Flux MCP Server
-"""
-
 import asyncio
 import os
 import sys
@@ -25,18 +20,17 @@ if env_file.exists():
 from flux_adapter import FluxAdapter
 
 async def test():
-    print("🧪 Testing Flux MCP Server")
+    print("Testing Flux MCP Server")
     print("=" * 30)
     
     # Check API key
     api_key = os.getenv("BFL_API_KEY")
-    if not api_key or api_key == "your_bfl_api_key_here":
-        print("❌ Please set your BFL_API_KEY in config/.env")
-        print("Copy config/.env.example to config/.env and add your key")
+    if not api_key or api_key == "key":
+        print("Please set your BFL_API_KEY in config/.env")
         return
     
-    print("✅ API key found")
-    print("⏳ Testing image generation...")
+    print("API key found")
+    print("Testing image generation...")
     
     try:
         # Create adapter
@@ -50,13 +44,13 @@ async def test():
         # Generate test image
         image_url, meta = await adapter.generate("A simple red circle")
         
-        print("🎉 SUCCESS!")
-        print(f"🖼️  Image URL: {image_url}")
-        print(f"🆔 Request ID: {meta['request_id']}")
-        print(f"🤖 Model: {meta['model']}")
+        print("SUCCESS!")
+        print(f"Image URL: {image_url}")
+        print(f"Request ID: {meta['request_id']}")
+        print(f"Model: {meta['model']}")
         
     except Exception as e:
-        print(f"❌ Error: {e}")
+        print(f"Error: {e}")
 
 if __name__ == "__main__":
     asyncio.run(test())
