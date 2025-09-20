@@ -162,7 +162,7 @@ def main():
     if args.test:
         # Test mode - just verify everything loads
         print('Flux MCP Server loaded successfully')
-        print('Tools available: flux_generate')
+        print('Tools available: flux_generate, flux_edit_image')
         api_key = os.getenv("BFL_API_KEY")
         print(f'API Key configured: {"Yes" if api_key else "No"}')
         return 0

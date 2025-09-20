@@ -19,4 +19,4 @@ build-backend = "setuptools.build_meta"
 packages = ["src"]
 
 [project.scripts]
-main = "src.main:main"
+main = "main:main"
