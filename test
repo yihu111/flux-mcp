@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=45", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "flux-mcp"
+version = "0.1.0"
+description = "MCP Server for AI image generation using Black Forest Labs' Flux models"
+requires-python = ">=3.10"
+
+dependencies = [
+    "fastmcp",
+    "python-dotenv",
+    "requests",
+    "pydantic",
+]
+
+[project.scripts]
+flux-mcp-server = "src.main:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools]
+package-dir = {"" = "src"}

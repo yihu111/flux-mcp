@@ -52,6 +52,9 @@ class FluxAdapter:
     async def generate(self, prompt_text: str, *, input_image: Optional[str] = None, guidance_scale: Optional[float] = None) -> Tuple[str, Dict]:
         return await asyncio.to_thread(self._generate_sync, prompt_text, input_image, guidance_scale)
 
+    async def edit_image(self, prompt_text: str, image_url: str, *, aspect_ratio: Optional[str] = None, seed: Optional[int] = None, output_format: str = "jpeg") -> Tuple[str, Dict]:
+        return await asyncio.to_thread(self._edit_image_sync, prompt_text, image_url, aspect_ratio, seed, output_format)
+
     # ---------------- internal (sync) ----------------
 
     def _generate_sync(self, prompt_text: str, input_image: Optional[str], guidance_scale: Optional[float]) -> Tuple[str, Dict[str, Any]]:
@@ -89,6 +92,65 @@ class FluxAdapter:
         meta = {
             "request_id": request_id,
             "model": self.model,
+            "result": result.get("result", {}),
+        }
+        return sample, meta
+
+    def _edit_image_sync(self, prompt_text: str, image_url: str, aspect_ratio: Optional[str], seed: Optional[int], output_format: str) -> Tuple[str, Dict[str, Any]]:
+        """
+        Synchronous image editing using FLUX.1 Kontext API
+        """
+        # Download and convert image to base64
+        try:
+            if image_url.startswith('data:'):
+                # Already base64 encoded
+                input_image_b64 = image_url
+            else:
+                # Download the image
+                img_response = self._session.get(image_url, timeout=(self.connect_timeout, self.read_timeout))
+                img_response.raise_for_status()
+                
+                # Convert to base64
+                img_data = base64.b64encode(img_response.content).decode('utf-8')
+                content_type = img_response.headers.get('content-type', 'image/jpeg')
+                input_image_b64 = f"data:{content_type};base64,{img_data}"
+        except Exception as e:
+            raise ValueError(f"Failed to process input image: {str(e)}")
+
+        # Prepare payload for Kontext API
+        payload: Dict[str, Any] = {
+            "prompt": prompt_text,
+            "input_image": input_image_b64,
+            "safety_tolerance": self.safety_tolerance,
+            "prompt_upsampling": self.prompt_upsampling,
+            "output_format": output_format,
+        }
+
+        if aspect_ratio:
+            payload["aspect_ratio"] = aspect_ratio
+        elif self.aspect_ratio:
+            payload["aspect_ratio"] = self.aspect_ratio
+
+        if seed is not None:
+            payload["seed"] = seed
+
+        # Use Kontext endpoint
+        endpoint = f"{self.base_url}/v1/flux-kontext-pro"
+        resp = self._post_with_retries(endpoint, payload)
+        data = resp.json()
+        request_id = data["id"]
+        polling_url = data.get("polling_url", f"{self.base_url}/v1/get_result")
+
+        result = self._poll_for_result(polling_url, request_id, self.poll_timeout)
+        sample = result.get("result", {}).get("sample")
+        if not sample:
+            raise RuntimeError(f"Missing sample in result: {result}")
+
+        meta = {
+            "request_id": request_id,
+            "model": "flux-kontext-pro",
+            "operation": "image_edit",
+            "original_image": image_url,
             "result": result.get("result", {}),
         }
         return sample, meta

@@ -45,10 +45,11 @@ mcp = FastMCP(
     name='Flux Image Generator',
     host=host,
     port=port,
-    instructions="""This MCP server provides AI image generation using Black Forest Labs' Flux models.
+    instructions="""This MCP server provides AI image generation and editing using Black Forest Labs' Flux models.
     
 Available tools:
-- flux_generate(prompt): Generate images using Flux diffusion models
+- flux_generate(prompt): Generate new images using Flux diffusion models
+- flux_edit_image(prompt, image_url): Edit existing images using Flux Kontext models
 
 This server requires a BFL_API_KEY environment variable to function.""",
 )
@@ -89,6 +90,56 @@ async def flux_generate(prompt: str) -> Dict[str, Any]:
         )
         image_url, meta = await adapter.generate(prompt)
         return {"status": "success", "image": image_url, "meta": meta}
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+
+
+@mcp.tool()
+async def flux_edit_image(prompt: str, image_url: str, aspect_ratio: Optional[str] = None, seed: Optional[int] = None, output_format: str = "jpeg") -> Dict[str, Any]:
+    """
+    Edit an existing image using Black Forest Labs FLUX Kontext model.
+
+    Args:
+        prompt: Description of the edit to be applied to the image
+        image_url: URL of the image to edit
+        aspect_ratio: Desired aspect ratio (e.g., "16:9", "1:1"). Optional.
+        seed: Seed for reproducibility. Optional.
+        output_format: Output format ("jpeg" or "png"). Defaults to "jpeg".
+
+    Returns:
+        Dictionary containing success status and URL of the edited image
+    """
+    api_key = os.getenv("BFL_API_KEY")
+    if not api_key:
+        return {"status": "error", "message": "BFL_API_KEY not set"}
+    
+    if not image_url:
+        return {"status": "error", "message": "image_url is required"}
+    
+    try:
+        adapter = FluxAdapter(
+            model="flux-kontext-max",
+            use_raw_mode=False,
+            api_key=api_key,
+            aspect_ratio=aspect_ratio,
+            safety_tolerance=6,
+            prompt_upsampling=False,
+        )
+        
+        edited_image_url, meta = await adapter.edit_image(
+            prompt_text=prompt,
+            image_url=image_url,
+            aspect_ratio=aspect_ratio,
+            seed=seed,
+            output_format=output_format
+        )
+        
+        return {
+            "status": "success", 
+            "edited_image": edited_image_url, 
+            "original_image": image_url,
+            "meta": meta
+        }
     except Exception as e:
         return {"status": "error", "message": str(e)}
 
