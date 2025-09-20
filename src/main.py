@@ -6,9 +6,15 @@ from typing import Optional
 from pathlib import Path
 
 
-# Load environment variables from config/.env file
-config_dir = Path(__file__).parent.parent / "config"
-load_dotenv(config_dir / ".env")
+# Load environment variables from config/.env file (for local development)
+# In deployment, environment variables are provided by the platform
+try:
+    config_dir = Path(__file__).parent.parent / "config"
+    if (config_dir / ".env").exists():
+        load_dotenv(config_dir / ".env")
+except Exception:
+    # Ignore errors in deployment environments
+    pass
 
 # Create an MCP server
 mcp = FastMCP("ImageEditor")
