@@ -14,3 +14,9 @@ dependencies = [
     "requests",
     "pydantic",
 ]
+
+[project.scripts]
+flux-mcp-server = "src.main:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src"]
