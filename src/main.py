@@ -1,8 +1,8 @@
-from mcp.server.fastmcp import FastMCP
+from fastmcp import FastMCP
 from dotenv import load_dotenv
 from .flux_adapter import FluxAdapter
 import os
-from typing import Optional
+from typing import Any, Dict, Optional
 from pathlib import Path
 
 
@@ -21,14 +21,24 @@ mcp = FastMCP("ImageEditor")
 
 
 @mcp.tool()
-async def flux_generate(prompt: str,
-                        model: str = "flux-pro-1.1",
-                        aspect_ratio: str | None = "16:9",
-                        width: int = 1024,
-                        height: int = 1024,
-                        raw: bool = False,
-                        safety_tolerance: int = 6,
-                        prompt_upsampling: bool = False) -> dict:
+async def flux_generate(prompt: str) -> Dict[str, Any]:
+    """
+    Generate a new image using Black Forest Labs FLUX diffusion model.
+
+    Args:
+        prompt: The prompt to be given to diffusion model
+
+    Returns:
+        Dictionary containing success status and URL of the generated image
+    """
+    safety_tolerance = 6
+    prompt_upsampling = False
+    raw = False
+    model = "flux-pro-1.1"
+    width: int = 1024
+    height: int = 1024
+    aspect_ratio: str | None = "16:9"
+
     api_key = os.getenv("BFL_API_KEY")
     if not api_key:
         return {"status": "error", "message": "BFL_API_KEY not set"}
